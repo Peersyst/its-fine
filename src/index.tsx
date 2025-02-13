@@ -198,10 +198,13 @@ export type ContextMap = Map<React.Context<any>, any> & {
 
 /**
  * Returns a map of all contexts and their values.
+ *
+ * @param ignoredContexts - An optional array of context names to ignore. Should be memoized.
  */
-export function useContextMap(): ContextMap {
+export function useContextMap(ignoredContexts: string[] = []): ContextMap {
   const fiber = useFiber()
   const [contextMap] = React.useState(() => new Map<React.Context<any>, any>())
+  const ignoredContextsSet = React.useMemo(() => new Set(ignoredContexts), [ignoredContexts])
 
   // Collect live context
   contextMap.clear()
@@ -211,7 +214,12 @@ export function useContextMap(): ContextMap {
       // https://github.com/facebook/react/pull/28226
       const enableRenderableContext = node.type._context === undefined && node.type.Provider === node.type
       const context = enableRenderableContext ? node.type : node.type._context
-      if (context && context !== FiberContext && !contextMap.has(context)) {
+      if (
+        context &&
+        context !== FiberContext &&
+        (!context.displayName || !ignoredContextsSet.has(context.displayName)) &&
+        !contextMap.has(context)
+      ) {
         contextMap.set(context, React.useContext(wrapContext(context)))
       }
     }
@@ -230,10 +238,12 @@ export type ContextBridge = React.FC<React.PropsWithChildren<{}>>
 /**
  * React Context currently cannot be shared across [React renderers](https://reactjs.org/docs/codebase-overview.html#renderers) but explicitly forwarded between providers (see [react#17275](https://github.com/facebook/react/issues/17275)). This hook returns a {@link ContextBridge} of live context providers to pierce Context across renderers.
  *
+ * @param ignoredContexts - An optional array of context names to ignore. Should be memoized.
+ *
  * Pass {@link ContextBridge} as a component to a secondary renderer to enable context-sharing within its children.
  */
-export function useContextBridge(): ContextBridge {
-  const contextMap = useContextMap()
+export function useContextBridge(ignoredContexts: string[] = []): ContextBridge {
+  const contextMap = useContextMap(ignoredContexts)
 
   // Flatten context and their memoized values into a `ContextBridge` provider
   return React.useMemo(
