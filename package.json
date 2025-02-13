@@ -21,10 +21,7 @@
     "src/*"
   ],
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "react-native": "./dist/index.js",
+  "main": "src/index.tsx",
   "sideEffects": false,
   "devDependencies": {
     "@types/node": "^18.7.15",
