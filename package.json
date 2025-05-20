@@ -21,7 +21,8 @@
     "src/*"
   ],
   "type": "module",
-  "main": "src/index.tsx",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "sideEffects": false,
   "devDependencies": {
     "@types/node": "^18.7.15",
@@ -44,6 +45,7 @@
   },
   "scripts": {
     "build": "rimraf dist && vite build && tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "npm run build"
   }
 }
