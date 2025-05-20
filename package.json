@@ -46,7 +46,6 @@
   },
   "scripts": {
     "build": "rimraf dist && vite build && tsc",
-    "test": "vitest run",
-    "postinstall": "npm run build"
+    "test": "vitest run"
   }
 }
